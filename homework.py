@@ -42,8 +42,9 @@ formatter = logging.Formatter(
 handler.setFormatter(formatter)
 LOGGER.addHandler(logging.StreamHandler())
 
+
 def check_tokens():
-    """Проверка токенов"""
+    """Проверка токенов."""
     if not PRACTICUM_TOKEN:
         LOGGER.critical('Не найден PRACTICUM_TOKEN!')
         return False
@@ -80,7 +81,9 @@ def get_api_answer(timestamp):
             response.raise_for_status()
     except requests.RequestException as error:
         LOGGER.error(f'Произошла ошибка при запросе к ENDPOINT: {error}')
-    LOGGER.debug(f'Произошел запрос к ENDPOINT. Код ответа: {response.status_code}.')
+    LOGGER.debug(
+        f'Произошел запрос к ENDPOINT. Код ответа: {response.status_code}.'
+        )
     try:
         response_json = response.json()
     except Exception as error:
@@ -94,21 +97,29 @@ def check_response(response):
     о последней домашке.
     """
     if type(response) != dict:
-        LOGGER.error(f'response не словарь: type(response) != {type(response)}.')
+        LOGGER.error(
+            f'response не словарь: type(response) != {type(response)}.'
+            )
         raise TypeError
     try:
         homeworks = response['homeworks']
     except KeyError as error:
         LOGGER.error(f'response не содержит ключ {error}')
     if type(homeworks) != list:
-        LOGGER.error(f'Список домашек не list: type(homeworks) != {type(homeworks)}.')
+        LOGGER.error(
+            f'Список домашек не list: type(homeworks) != {type(homeworks)}.'
+            )
         raise TypeError
     if len(homeworks) == 0:
-        LOGGER.error(f'Список домашек пуст: len(homeworks) = {len(homeworks)}.')
+        LOGGER.error(
+            f'Список домашек пуст: len(homeworks) = {len(homeworks)}.'
+            )
         raise IndexError
     homework_name = homeworks[0].get('homework_name')
     if not homework_name:
-        LOGGER.error(f'В домашке нет homework_name. homework_name = {homework_name}')
+        LOGGER.error(
+            f'В домашке нет homework_name. homework_name = {homework_name}'
+            )
         raise KeyError
     status = homeworks[0].get('status')
     if not status:
@@ -126,7 +137,9 @@ def parse_status(homework):
         raise KeyError
     status = homework.get('status')
     if status not in HOMEWORK_VERDICTS.keys():
-        LOGGER.error(f'Получил недокументированный статус домашки, status = {status}')
+        LOGGER.error(
+            f'Получил недокументированный статус домашки, status = {status}'
+            )
         raise KeyError
     verdict = HOMEWORK_VERDICTS[status]
     LOGGER.debug(f'Получил статус домашки status = {status}')
@@ -153,17 +166,19 @@ def main():
                         send_message(bot, message)
                         statuses.pop()
                 else:
-                    LOGGER.error(f'Не пройдена проверка response. check_response = {check}')
+                    LOGGER.error(
+                        f'Не пройдена проверка response. check_response = {check}'
+                        )
                 time.sleep(RETRY_PERIOD)
             except Exception as error:
                 LOGGER.error(f'Сбой в работе программы: {error}')
             finally:
                 time.sleep(RETRY_PERIOD)
         else:
-            LOGGER.critical('Не обнаружены переменные окружения! Остановка бота.')
+            LOGGER.critical(
+                'Не обнаружены переменные окружения!Остановка бота.'
+                )
             sys.exit('Не обнаружены переменные окружения! Остановка бота.')
-
-
 
 if __name__ == '__main__':
     main()
