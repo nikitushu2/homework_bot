@@ -83,7 +83,7 @@ def get_api_answer(timestamp):
         LOGGER.error(f'Произошла ошибка при запросе к ENDPOINT: {error}')
     LOGGER.debug(
         f'Произошел запрос к ENDPOINT. Код ответа: {response.status_code}.'
-        )
+    )
     try:
         response_json = response.json()
     except Exception as error:
@@ -99,7 +99,7 @@ def check_response(response):
     if type(response) != dict:
         LOGGER.error(
             f'response не словарь: type(response) != {type(response)}.'
-            )
+        )
         raise TypeError
     try:
         homeworks = response['homeworks']
@@ -108,18 +108,18 @@ def check_response(response):
     if type(homeworks) != list:
         LOGGER.error(
             f'Список домашек не list: type(homeworks) != {type(homeworks)}.'
-            )
+        )
         raise TypeError
     if len(homeworks) == 0:
         LOGGER.error(
             f'Список домашек пуст: len(homeworks) = {len(homeworks)}.'
-            )
+        )
         raise IndexError
     homework_name = homeworks[0].get('homework_name')
     if not homework_name:
         LOGGER.error(
             f'В домашке нет homework_name. homework_name = {homework_name}'
-            )
+        )
         raise KeyError
     status = homeworks[0].get('status')
     if not status:
@@ -139,7 +139,7 @@ def parse_status(homework):
     if status not in HOMEWORK_VERDICTS.keys():
         LOGGER.error(
             f'Получил недокументированный статус домашки, status = {status}'
-            )
+        )
         raise KeyError
     verdict = HOMEWORK_VERDICTS[status]
     LOGGER.debug(f'Получил статус домашки status = {status}')
@@ -167,8 +167,8 @@ def main():
                         statuses.pop()
                 else:
                     LOGGER.error(
-                        f'Не пройдена проверка response. check_response = {check}'
-                        )
+                        f'Не пройдена проверка check_response = {check}'
+                    )
                 time.sleep(RETRY_PERIOD)
             except Exception as error:
                 LOGGER.error(f'Сбой в работе программы: {error}')
