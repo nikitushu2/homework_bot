@@ -52,7 +52,7 @@ def check_tokens():
     for token in tokens:
         if not token:
             LOGGER.critical(f'Не найден {token}')
-            error += 1
+            errors += 1
     if errors > 0:
         return False
     return True
