@@ -45,15 +45,17 @@ LOGGER.addHandler(logging.StreamHandler())
 
 def check_tokens():
     """Проверка токенов."""
-    tokens = [PRACTICUM_TOKEN,
-              TELEGRAM_TOKEN,
-              TELEGRAM_CHAT_ID]
-    errors = 0
-    for token in tokens:
-        if not token:
-            LOGGER.critical(f'Не найден {token}')
-            errors += 1
-    if errors > 0:
+    error = False
+    if not PRACTICUM_TOKEN:
+        LOGGER.critical('Не найден PRACTICUM_TOKEN!')
+        error = True
+    if not TELEGRAM_TOKEN:
+        LOGGER.critical('Не найден TELEGRAM_TOKEN!')
+        error = True
+    if not TELEGRAM_CHAT_ID:
+        LOGGER.critical('Не найден TELEGRAM_CHAT_ID!')
+        error = True
+    if error:
         return False
     return True
 
