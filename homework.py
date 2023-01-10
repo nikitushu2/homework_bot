@@ -85,7 +85,7 @@ def get_api_answer(timestamp):
             response.raise_for_status()
     except requests.RequestException as error:
         LOGGER.error(f'Произошла ошибка при запросе к ENDPOINT: {error}')
-        sys.exit()
+        return
     LOGGER.debug(
         f'Произошел запрос к ENDPOINT. Код ответа: {response.status_code}.'
     )
