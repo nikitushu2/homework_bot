@@ -20,7 +20,7 @@ ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
 
-HOMEWORK_VERDICTS = {
+HOMEWORK_VERDICTS: dict[str, str] = {
     'approved': 'Работа проверена: ревьюеру всё понравилось. Ура!',
     'reviewing': 'Работа взята на проверку ревьюером.',
     'rejected': 'Работа проверена: у ревьюера есть замечания.'
@@ -45,14 +45,15 @@ LOGGER.addHandler(logging.StreamHandler())
 
 def check_tokens():
     """Проверка токенов."""
-    if not PRACTICUM_TOKEN:
-        LOGGER.critical('Не найден PRACTICUM_TOKEN!')
-        return False
-    if not TELEGRAM_TOKEN:
-        LOGGER.critical('Не найден TELEGRAM_TOKEN!')
-        return False
-    if not TELEGRAM_CHAT_ID:
-        LOGGER.critical('Не найден TELEGRAM_CHAT_ID!')
+    tokens = [PRACTICUM_TOKEN,
+              TELEGRAM_TOKEN,
+              TELEGRAM_CHAT_ID]
+    errors = 0
+    for token in tokens:
+        if not token:
+            LOGGER.critical(f'Не найден {token}')
+            error += 1
+    if errors > 0:
         return False
     return True
 
@@ -81,6 +82,7 @@ def get_api_answer(timestamp):
             response.raise_for_status()
     except requests.RequestException as error:
         LOGGER.error(f'Произошла ошибка при запросе к ENDPOINT: {error}')
+        sys.exit()
     LOGGER.debug(
         f'Произошел запрос к ENDPOINT. Код ответа: {response.status_code}.'
     )
@@ -96,7 +98,7 @@ def check_response(response):
     В случае успеха возвращает словарь с данными
     о последней домашке.
     """
-    if type(response) != dict:
+    if not isinstance(response, dict):
         LOGGER.error(
             f'response не словарь: type(response) != {type(response)}.'
         )
@@ -110,7 +112,7 @@ def check_response(response):
             f'Список домашек не list: type(homeworks) != {type(homeworks)}.'
         )
         raise TypeError
-    if len(homeworks) == 0:
+    if not homeworks:
         LOGGER.error(
             f'Список домашек пуст: len(homeworks) = {len(homeworks)}.'
         )
