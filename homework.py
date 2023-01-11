@@ -82,7 +82,7 @@ def get_api_answer(timestamp):
             LOGGER.error(f'Запрос к ENDPOINT {response.status_code} != 200')
             response.raise_for_status()
     except requests.RequestException as error:
-        LOGGER.error(f'Произошла ошибка при запросе к ENDPOINT: {error}'
+        LOGGER.error(f'Произошла ошибка при запросе к ENDPOINT: {error}')
     LOGGER.debug(
         f'Произошел запрос к ENDPOINT. Код ответа: {response.status_code}.'
     )
