@@ -46,19 +46,17 @@ LOGGER.addHandler(logging.StreamHandler())
 
 def check_tokens():
     """Проверка токенов."""
-    error = False
+    errors = []
     if not PRACTICUM_TOKEN:
         LOGGER.critical('Не найден PRACTICUM_TOKEN!')
-        error = True
+        errors.append(PRACTICUM_TOKEN)
     if not TELEGRAM_TOKEN:
         LOGGER.critical('Не найден TELEGRAM_TOKEN!')
-        error = True
+        errors.append(TELEGRAM_TOKEN)
     if not TELEGRAM_CHAT_ID:
         LOGGER.critical('Не найден TELEGRAM_CHAT_ID!')
-        error = True
-    if error:
-        return False
-    return True
+        errors.append(TELEGRAM_CHAT_ID)
+    return errors
 
 
 def send_message(bot, message):
@@ -84,8 +82,7 @@ def get_api_answer(timestamp):
             LOGGER.error(f'Запрос к ENDPOINT {response.status_code} != 200')
             response.raise_for_status()
     except requests.RequestException as error:
-        LOGGER.error(f'Произошла ошибка при запросе к ENDPOINT: {error}')
-        return
+        LOGGER.error(f'Произошла ошибка при запросе к ENDPOINT: {error}'
     LOGGER.debug(
         f'Произошел запрос к ENDPOINT. Код ответа: {response.status_code}.'
     )
@@ -93,6 +90,7 @@ def get_api_answer(timestamp):
         response_json = response.json()
     except Exception as error:
         LOGGER.error(f'Произошла ошибка при преобразовании в json: {error}')
+        raise SystemError
     return response_json
 
 
@@ -110,7 +108,7 @@ def check_response(response):
         homeworks = response['homeworks']
     except KeyError as error:
         LOGGER.error(f'response не содержит ключ {error}')
-    if type(homeworks) != list:
+    if not isinstance(homeworks, list):
         LOGGER.error(
             f'Список домашек не list: type(homeworks) != {type(homeworks)}.'
         )
@@ -156,7 +154,7 @@ def main():
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     statuses = ['reviewing']
     while True:
-        if check_tokens():
+        if check_tokens() == []:
             try:
                 timestamp = int(time.time())
                 api_answer = get_api_answer(timestamp)
