@@ -83,14 +83,15 @@ def get_api_answer(timestamp):
             response.raise_for_status()
     except requests.RequestException as error:
         LOGGER.error(f'Произошла ошибка при запросе к ENDPOINT: {error}')
+        raise TypeError
     LOGGER.debug(
         f'Произошел запрос к ENDPOINT. Код ответа: {response.status_code}.'
     )
     try:
         response_json = response.json()
-    except Exception as error:
+    except requests.JSONDecodeError as error:
         LOGGER.error(f'Произошла ошибка при преобразовании в json: {error}')
-        raise SystemError
+        raise TypeError
     return response_json
 
 
@@ -154,7 +155,7 @@ def main():
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     statuses = ['reviewing']
     while True:
-        if check_tokens() == []:
+        if not check_tokens():
             try:
                 timestamp = int(time.time())
                 api_answer = get_api_answer(timestamp)
